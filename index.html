@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda 2030: Sustainable Development Goals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+  if (window.location.pathname.endsWith("index.html")) {
+    window.location.replace("/");
+  }
+</script>
+    <style>
+        /* Custom Chart Container Styles as per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        
+        /* Smooth fade transition */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Active tab styling */
+        .tab-active {
+            border-bottom: 3px solid #0d9488; /* teal-600 */
+            color: #0f172a; /* slate-900 */
+            font-weight: 600;
+        }
+        .tab-inactive {
+            color: #64748b; /* slate-500 */
+        }
+        .tab-inactive:hover {
+            color: #0d9488;
+        }
+
+        /* Goal Tile Interaction */
+        .goal-tile {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .goal-tile:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .goal-tile.active {
+            ring: 4px;
+            ring-color: #0d9488;
+            transform: scale(1.05);
+        }
+    </style>
+    <!-- Chosen Palette: Earth & Harmony (Warm Neutrals: Stone-50 background, Teal-600 accents, Slate-800 text) -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Sets the context of the 2030 Agenda.
+         2. The 5 Ps Interactive: Breaks down the core philosophy (People, Planet, Prosperity, Peace, Partnership) to avoid overwhelming text.
+         3. The 17 Goals Matrix: The core interaction. A grid of goals that, when clicked, populates a detail view. This allows users to explore specific goals without a long scrolling page.
+         4. Global Analytics: Visualizing the data aspect (Progress and Gaps) using Chart.js to show the quantitative side.
+         5. Country Milestone (Morocco): A distinct, simplified section at the end as requested, serving as a practical application example.
+    -->
+    <!-- Visualization & Content Choices:
+         - 5 Ps Tabs: Text/Concept -> Goal: Inform -> Interactive Tabs -> Reduces cognitive load.
+         - Goals Grid: List of 17 items -> Goal: Organize/Explore -> Clickable Grid + Detail Panel -> Allows non-linear exploration.
+         - Progress Chart: Global Status Data -> Goal: Compare -> Bar Chart (Chart.js) -> Shows 'On Track' vs 'Off Track'.
+         - Funding Gap: Financial Data -> Goal: Inform -> Doughnut Chart (Chart.js) -> Highlights the challenge.
+         - Morocco Milestone: National Strategy -> Goal: Exemplify -> Text Card + Progress Bar -> Simple, clear example.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 text-slate-800 font-sans leading-relaxed selection:bg-teal-100 selection:text-teal-900">
+
+    <!-- Navigation / Header -->
+    <header class="bg-white shadow-sm border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <span class="text-2xl">🌍</span>
+                <h1 class="text-xl font-bold tracking-tight text-slate-900">Agenda 2030 <span class="text-teal-600 font-light">| Monitor</span></h1>
+            </div>
+            <nav class="hidden md:flex space-x-8 text-sm font-medium">
+                <a href="#philosophy" class="hover:text-teal-600 transition-colors">Philosophy</a>
+                <a href="#goals-matrix" class="hover:text-teal-600 transition-colors">The 17 Goals</a>
+                <a href="#analytics" class="hover:text-teal-600 transition-colors">Global Analysis</a>
+                <a href="#case-study" class="hover:text-teal-600 transition-colors">Case Study</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- Section 1: Introduction & The 5 Ps -->
+        <section id="philosophy" class="space-y-6">
+            <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl font-extrabold text-slate-900 sm:text-4xl">A Shared Blueprint for Peace and Prosperity</h2>
+                <p class="mt-4 text-lg text-slate-600">
+                     The 2030 Agenda for Sustainable Development, adopted by all United Nations Member States in 2015, provides a shared blueprint for peace and prosperity for people and the planet, now and into the future. At its heart are the 17 Sustainable Development Goals (SDGs).
+                </p>
+                <div class="mt-6 p-4 bg-teal-50 rounded-lg border border-teal-100 text-teal-800 text-sm">
+                    <strong>Interactive Guide:</strong> Click the tabs below to explore the "5 Ps" that form the foundation of the SDGs.
+                </div>
+            </div>
+
+            <!-- Interactive Tabs for 5 Ps -->
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                <div class="flex flex-wrap border-b border-stone-200 bg-stone-50" id="ps-tabs-container">
+                    <!-- Tabs injected by JS -->
+                </div>
+                <div class="p-8" id="ps-content-area">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: The 17 Goals Explorer -->
+        <section id="goals-matrix" class="scroll-mt-20">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-slate-900">The 17 Goals Explorer</h3>
+                <p class="mt-2 text-slate-600 max-w-4xl">
+                    The SDGs are an urgent call for action by all countries - developed and developing - in a global partnership. 
+                    <span class="font-semibold text-teal-700">Select a goal icon below</span> to view its specific objectives, current global relevance, and key targets.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left: The Grid -->
+                <div class="lg:col-span-2">
+                    <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3" id="goals-grid">
+                        <!-- Goal Tiles Injected Here -->
+                    </div>
+                </div>
+
+                <!-- Right: The Detail Panel -->
+                <div class="lg:col-span-1">
+                    <div id="goal-detail-panel" class="bg-white rounded-xl shadow-lg border border-stone-200 p-6 sticky top-24 h-fit min-h-[400px] flex flex-col justify-between transition-all duration[...]
+                        <!-- Default State -->
+                        <div class="text-center py-10 text-slate-400">
+                            <span class="text-6xl mb-4 block">👆</span>
+                            <p>Select a goal from the grid to see details.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Global Analytics (Charts) -->
+        <section id="analytics" class="scroll-mt-20 bg-stone-100 rounded-2xl p-6 sm:p-10">
+            <div class="mb-8 text-center">
+                <h3 class="text-2xl font-bold text-slate-900">Global Progress Dashboard</h3>
+                <p class="mt-2 text-slate-600">
+                    Quantitative analysis of the global effort towards the 2030 targets. While progress has been made, significant gaps remain in funding and implementation speed.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                
+                <!-- Chart 1: Status -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex flex-col items-center">
+                    <h4 class="text-lg font-semibold text-slate-800 mb-2">Current Assessment of Targets</h4>
+                    <p class="text-xs text-slate-500 mb-4 text-center">Percentage of targets on track vs. needing acceleration (Simulated Global Aggregate)</p>
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm text-slate-600 bg-stone-50 p-3 rounded w-full">
+                        <strong>Insight:</strong> Only about 15% of targets are on track. A significant portion requires accelerated effort or has regressed due to recent global crises.
+                    </div>
+                </div>
+
+                <!-- Chart 2: Funding -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex flex-col items-center">
+                    <h4 class="text-lg font-semibold text-slate-800 mb-2">The SDG Financing Gap</h4>
+                    <p class="text-xs text-slate-500 mb-4 text-center">Estimated annual investment gap in developing countries (USD Trillions)</p>
+                    <div class="chart-container">
+                        <canvas id="fundingChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm text-slate-600 bg-stone-50 p-3 rounded w-full">
+                        <strong>Insight:</strong> The annual funding gap has widened to approximately $4.2 trillion, emphasizing the need for robust private-public partnerships.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section 4: Country Milestone (Morocco) -->
+        <section id="case-study" class="scroll-mt-20 border-t-4 border-teal-600 pt-10">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <div class="md:w-1/3">
+                    <div class="bg-red-50 p-6 rounded-xl border border-red-100">
+                        <h3 class="text-xl font-bold text-red-900 mb-2 flex items-center">
+                            <span class="mr-2">🇲🇦</span> Case Study: Morocco
+                        </h3>
+                        <p class="text-sm text-red-800 opacity-80 font-medium">An Example of National Integration</p>
+                    </div>
+                </div>
+                <div class="md:w-2/3 space-y-4">
+                    <p class="text-slate-700 leading-relaxed">
+                        As requested, we examine <strong>Morocco</strong> as a milestone example of integrating SDGs into national policy. Morocco has aligned its development trajectory with the 2030 [...]
+                    </p>
+                    <p class="text-slate-700 leading-relaxed">
+                        This framework is unique because it is constitutionally recognized, ensuring long-term commitment. A flagship achievement is the country's transition to renewable energy.
+                    </p>
+                    
+                    <!-- Simple visual for the milestone -->
+                    <div class="mt-6 bg-white p-5 rounded-lg border border-stone-200 shadow-sm">
+                        <div class="flex justify-between items-end mb-2">
+                            <span class="font-bold text-slate-800">Renewable Energy Target (2030)</span>
+                            <span class="text-teal-600 font-bold">52%</span>
+                        </div>
+                        <div class="w-full bg-stone-200 rounded-full h-4 overflow-hidden">
+                            <div class="bg-teal-600 h-4 rounded-full" style="width: 52%"></div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">
+                            Morocco aims to generate 52% of its electricity from renewable sources by 2030, driven by projects like the Noor Ouarzazate Solar Complex.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Author Info (pulled from GitHub profile) -->
+    <section id="author-info" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div id="author-loading" class="bg-white rounded-xl border border-stone-200 p-4 text-slate-600 text-sm flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-stone-100 rounded-full animate-pulse"></div>
+                <div>
+                    <div class="h-4 w-40 bg-stone-100 rounded mb-2 animate-pulse"></div>
+                    <div class="h-3 w-28 bg-stone-100 rounded animate-pulse"></div>
+                </div>
+            </div>
+            <div class="text-xs text-slate-400">Loading contributor info from GitHub...</div>
+        </div>
+
+        <div id="author-card" class="hidden bg-white rounded-xl border border-stone-200 p-4 mt-4 flex items-center gap-4">
+            <!-- Populated by JS -->
+        </div>
+    </section>
+
+    <footer class="bg-slate-900 text-slate-400 py-10 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="mb-2 text-white font-semibold">Sustainable Development Goals Explorer</p>
+            <p class="text-sm">Synthesized interactive report based on the United Nations 2030 Agenda.</p>
+            <div class="mt-8 pt-8 border-t border-slate-800 text-xs">
+                &copy; 2025 Interactive Analysis. All visualizations generated using Chart.js.
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- DATA STORE ---
+
+        // The 5 Ps Content
+        const psData = [
+            {
+                id: 'people',
+                title: 'People',
+                icon: '👥',
+                content: 'End poverty and hunger, in all their forms and dimensions, and ensure that all human beings can fulfill their potential in dignity and equality and in a healthy environment.'
+            },
+            {
+                id: 'planet',
+                title: 'Planet',
+                icon: '🌍',
+                content: 'Protect the planet from degradation, including through sustainable consumption and production, sustainably managing its natural resources and taking urgent action on climate [...]'
+            },
+            {
+                id: 'prosperity',
+                title: 'Prosperity',
+                icon: '🌱',
+                content: 'Ensure that all human beings can enjoy prosperous and fulfilling lives and that economic, social and technological progress occurs in harmony with nature.'
+            },
+            {
+                id: 'peace',
+                title: 'Peace',
+                icon: '🕊️',
+                content: 'Foster peaceful, just and inclusive societies which are free from fear and violence. There can be no sustainable development without peace and no peace without sustainable de[...]'
+            },
+            {
+                id: 'partnership',
+                title: 'Partnership',
+                icon: '🤝',
+                content: 'Mobilize the means required to implement this Agenda through a revitalized Global Partnership for Sustainable Development, based on a spirit of strengthened global solidarity[...]'
+            }
+        ];
+
+        // The 17 Goals Data
+        const goalsData = [
+            { id: 1, title: "No Poverty", color: "#E5243B", icon: "🏠", stat: "700M+", statLabel: "People in extreme poverty", desc: "End poverty in all its forms everywhere." },
+            { id: 2, title: "Zero Hunger", color: "#DDA63A", icon: "🌾", stat: "2.4B", statLabel: "People without food security", desc: "End hunger, achieve food security and improved nutrition." },
+            { id: 3, title: "Good Health", color: "#4C9F38", icon: "❤️", stat: "3.8B", statLabel: "People lacking essential health services", desc: "Ensure healthy lives and promote well-being for[...]" },
+            { id: 4, title: "Quality Education", color: "#C5192D", icon: "🎓", stat: "147M", statLabel: "Missed over half of schooling", desc: "Ensure inclusive and equitable quality education for a[...]" },
+            { id: 5, title: "Gender Equality", color: "#FF3A21", icon: "⚖️", stat: "300y", statLabel: "To reach full gender equality at current rate", desc: "Achieve gender equality and empower al[...]" },
+            { id: 6, title: "Clean Water", color: "#26BDE2", icon: "💧", stat: "2B", statLabel: "People lacking safe drinking water", desc: "Ensure availability and sustainable management of water.[...]" },
+            { id: 7, title: "Clean Energy", color: "#FCC30B", icon: "⚡", stat: "675M", statLabel: "People without electricity", desc: "Ensure access to affordable, reliable, sustainable energy." },
+            { id: 8, title: "Decent Work", color: "#A21942", icon: "📈", stat: "5.8%", statLabel: "Global Unemployment Rate", desc: "Promote sustained, inclusive and sustainable economic growth." },
+            { id: 9, title: "Industry & Innovation", color: "#FD6925", icon: "🏗️", stat: "3.5B", statLabel: "People without internet access", desc: "Build resilient infrastructure, promote inclus[...]" },
+            { id: 10, title: "Reduced Inequalities", color: "#DD1367", icon: "📉", stat: "10%", statLabel: "Share of income going to bottom 40%", desc: "Reduce inequality within and among countries.[...]" },
+            { id: 11, title: "Sustainable Cities", color: "#FD9D24", icon: "🏙️", stat: "1B", statLabel: "Slum dwellers worldwide", desc: "Make cities and human settlements inclusive, safe, resili[...]" },
+            { id: 12, title: "Consumption", color: "#BF8B2E", icon: "🔄", stat: "13%", statLabel: "Food lost in supply chain", desc: "Ensure sustainable consumption and production patterns." },
+            { id: 13, title: "Climate Action", color: "#3F7E44", icon: "🌡️", stat: "+1.1°C", statLabel: "Warming since pre-industrial levels", desc: "Take urgent action to combat climate change [...]" },
+            { id: 14, title: "Life Below Water", color: "#0A97D9", icon: "🐟", stat: "17M", statLabel: "Metric tons of plastic in ocean (2021)", desc: "Conserve and sustainably use the oceans, seas [...]" },
+            { id: 15, title: "Life on Land", color: "#56C02B", icon: "🌳", stat: "100M", statLabel: "Hectares of healthy land lost annually", desc: "Protect, restore and promote sustainable use of t[...]" },
+            { id: 16, title: "Peace & Justice", color: "#00689D", icon: "🕊️", stat: "108M", statLabel: "Forcibly displaced people", desc: "Promote peaceful and inclusive societies for sustainable[...]" },
+            { id: 17, title: "Partnerships", color: "#19486A", icon: "🤝", stat: "$180B", statLabel: "Official Development Assistance (ODA)", desc: "Strengthen the means of implementation and revita[...]" }
+        ];
+
+        // --- DOM ELEMENTS & INITIALIZATION ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initPsTabs();
+            initGoalsGrid();
+            initCharts();
+        });
+
+        // --- 5 Ps INTERACTIVITY ---
+        function initPsTabs() {
+            const container = document.getElementById('ps-tabs-container');
+            const contentArea = document.getElementById('ps-content-area');
+            let activeTab = psData[0];
+
+            function render() {
+                // Render Tabs
+                container.innerHTML = psData.map(p => `
+                    <button 
+                        onclick="switchPsTab('${p.id}')"
+                        class="flex-1 py-4 px-2 text-center transition-colors duration-200 ${activeTab.id === p.id ? 'tab-active bg-white' : 'tab-inactive hover:bg-stone-100'}"
+                    >
+                        <span class="block text-xl mb-1">${p.icon}</span>
+                        <span class="text-sm uppercase tracking-wide">${p.title}</span>
+                    </button>
+                `).join('');
+
+                // Render Content
+                contentArea.innerHTML = `
+                    <div class="fade-in max-w-3xl mx-auto text-center">
+                        <div class="inline-block p-4 rounded-full bg-teal-50 mb-4 text-4xl">${activeTab.icon}</div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-4">${activeTab.title}</h3>
+                        <p class="text-lg text-slate-600 leading-relaxed">${activeTab.content}</p>
+                    </div>
+                `;
+            }
+
+            // Expose logic to global scope for HTML onclick
+            window.switchPsTab = (id) => {
+                activeTab = psData.find(p => p.id === id);
+                render();
+            };
+
+            render();
+        }
+
+        // --- GOALS GRID INTERACTIVITY ---
+        function initGoalsGrid() {
+            const grid = document.getElementById('goals-grid');
+            const detailPanel = document.getElementById('goal-detail-panel');
+
+            // Render Grid
+            grid.innerHTML = goalsData.map(goal => `
+                <div 
+                    class="goal-tile aspect-square rounded-lg flex flex-col items-center justify-center text-center p-2 text-white font-bold transition-all"
+                    style="background-color: ${goal.color};"
+                    onclick="showGoalDetails(${goal.id})"
+                >
+                    <span class="text-2xl mb-1 drop-shadow-md">${goal.icon}</span>
+                    <span class="text-xs sm:text-sm drop-shadow-sm">${goal.id}</span>
+                </div>
+            `).join('');
+
+            // Detail Logic
+            window.showGoalDetails = (id) => {
+                const goal = goalsData.find(g => g.id === id);
+                
+                // Highlight logic
+                document.querySelectorAll('.goal-tile').forEach(el => el.classList.remove('active'));
+                // Note: In a real app we'd map ID to index, but simple DOM order works here
+                grid.children[id-1].classList.add('active');
+
+                // Render Detail Panel
+                detailPanel.innerHTML = `
+                    <div class="fade-in h-full flex flex-col">
+                        <div class="border-b pb-4 mb-4" style="border-color: ${goal.color}">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold px-2 py-1 rounded text-white" style="background-color: ${goal.color}">GOAL ${goal.id}</span>
+                                <span class="text-2xl">${goal.icon}</span>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-800 leading-tight">${goal.title}</h2>
+                        </div>
+                        
+                        <div class="flex-grow space-y-6">
+                            <div>
+                                <h4 class="text-sm uppercase tracking-wide text-slate-400 font-bold mb-1">Objective</h4>
+                                <p class="text-slate-700">${goal.desc}</p>
+                            </div>
+                            
+                            <div class="bg-stone-50 p-4 rounded-lg border border-stone-200">
+                                <h4 class="text-sm uppercase tracking-wide text-slate-400 font-bold mb-2">Key Statistic</h4>
+                                <p class="text-3xl font-bold text-slate-900" style="color: ${goal.color}">${goal.stat}</p>
+                                <p class="text-xs text-slate-500 mt-1">${goal.statLabel}</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-stone-100 text-center">
+                            <button class="text-sm text-teal-600 font-medium hover:underline">View Targets &rarr;</button>
+                        </div>
+                    </div>
+                `;
+            };
+        }
+
+        // --- CHARTS (CHART.JS) ---
+        function initCharts() {
+            // Chart 1: Progress Status (Bar)
+            const ctxProgress = document.getElementById('progressChart').getContext('2d');
+            new Chart(ctxProgress, {
+                type: 'bar',
+                data: {
+                    labels: ['On Track', 'Fair Progress', 'Stagnation/Regression', 'Insufficient Data'],
+                    datasets: [{
+                        label: '% of Targets',
+                        data: [15, 33, 30, 22], // Simulated typical data based on 2023/24 reports
+                        backgroundColor: [
+                            '#10b981', // emerald-500 (good)
+                            '#f59e0b', // amber-500 (fair)
+                            '#ef4444', // red-500 (bad)
+                            '#cbd5e1'  // slate-300 (unknown)
+                        ],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.parsed.y}% of Targets`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { display: false }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Funding Gap (Doughnut)
+            const ctxFunding = document.getElementById('fundingChart').getContext('2d');
+            new Chart(ctxFunding, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Current Investment', 'Investment Gap'],
+                    datasets: [{
+                        data: [1.4, 4.2], // Trillions
+                        backgroundColor: [
+                            '#0d9488', // teal-600
+                            '#e2e8f0'  // slate-200
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { usePointStyle: true, padding: 20 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.parsed} Trillion USD`;
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'textCenter',
+                    beforeDraw: function(chart) {
+                        var width = chart.width, height = chart.height, ctx = chart.ctx;
+                        ctx.restore();
+                        var fontSize = (height / 114).toFixed(2);
+                        ctx.font = "bold " + fontSize + "em sans-serif";
+                        ctx.textBaseline = "middle";
+                        ctx.fillStyle = "#0f172a";
+                        var text = "GAP",
+                            textX = Math.round((width - ctx.measureText(text).width) / 2),
+                            textY = height / 2.2;
+                        ctx.fillText(text, textX, textY);
+                        
+                        ctx.font = "normal " + (height/200).toFixed(2) + "em sans-serif";
+                        ctx.fillStyle = "#64748b";
+                        var text2 = "$4.2T",
+                            textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
+                            textY2 = height / 1.7;
+                        ctx.fillText(text2, textX2, textY2);
+                        ctx.save();
+                    }
+                }]
+            });
+        }
+    </script>
+
+    <!-- AUTHOR INFO SCRIPT: fetches public GitHub profile for the username 'AzimSoufiane' and populates the small info margin above the footer -->
+    <script>
+        async function initAuthorInfo() {
+            const apiUrl = 'https://api.github.com/users/AzimSoufiane';
+            const loadingEl = document.getElementById('author-loading');
+            const cardEl = document.getElementById('author-card');
+
+            try {
+                const resp = await fetch(apiUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' }});
+                if (!resp.ok) throw new Error('GitHub API responded with ' + resp.status);
+                const profile = await resp.json();
+
+                // Build card content using available public fields
+                const name = profile.name || profile.login || 'AzimSoufiane';
+                const bio = profile.bio || '';
+                const avatar = profile.avatar_url || '';
+                const location = profile.location || '';
+                const blog = profile.blog || '';
+                const htmlUrl = profile.html_url || `https://github.com/${profile.login || 'AzimSoufiane'}`;
+                const publicRepos = profile.public_repos != null ? profile.public_repos : '';
+                const followers = profile.followers != null ? profile.followers : '';
+                const following = profile.following != null ? profile.following : '';
+
+                // Use the avatar from API if available, otherwise fall back to the GitHub user PNG which doesn't require the API
+                const fallbackAvatar = `https://github.com/${profile.login || 'AzimSoufiane'}.png`;
+                const avatarUrl = avatar || fallbackAvatar;
+
+                cardEl.innerHTML = `
+                    <img src="${avatarUrl}" onerror="this.onerror=null;this.src='${fallbackAvatar}';" referrerpolicy="no-referrer" alt="${name} avatar" class="w-16 h-16 rounded-full object-cover border border-stone-100">
+                    <div class="flex-1 min-w-0">
+                        <a href="${htmlUrl}" target="_blank" rel="noopener noreferrer" class="text-slate-900 font-semibold hover:underline block">${name} <span class="text-xs text-slate-500">(@${profile.login})</span></a>
+                        ${bio ? `<p class="text-sm text-slate-600 mt-1 truncate">${bio}</p>` : ''}
+                        <div class="mt-2 text-xs text-slate-500 flex flex-wrap items-center gap-3">
+                            ${location ? `<span class="inline-flex items-center gap-2">📍 ${location}</span>` : ''}
+                            ${blog ? `<a href="${/^https?:\/\//.test(blog) ? blog : 'https://' + blog}" target="_blank" rel="noopener noreferrer" class="text-teal-600 hover:underline">🔗 Website</a>` : ''}
+                            <span class="text-stone-400">•</span>
+                            <span>Repos: <strong class="text-slate-800">${publicRepos}</strong></span>
+                            <span>Followers: <strong class="text-slate-800">${followers}</strong></span>
+                            <span>Following: <strong class="text-slate-800">${following}</strong></span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <a href="${htmlUrl}" target="_blank" rel="noopener noreferrer" class="inline-block bg-teal-600 text-white px-3 py-2 rounded text-xs font-medium hover:bg-teal-700">View GitHub</a>
+                    </div>
+                `;
+
+                loadingEl.classList.add('hidden');
+                cardEl.classList.remove('hidden');
+            } catch (err) {
+                console.warn('Could not fetch GitHub profile:', err);
+                loadingEl.innerHTML = `<div class="flex items-center justify-between w-full">
+                    <div class="text-sm text-slate-600">Unable to load GitHub info right now.</div>
+                    <a href="https://github.com/AzimSoufiane" target="_blank" rel="noopener noreferrer" class="text-teal-600 hover:underline">Open GitHub profile</a>
+                </div>`;
+            }
+        }
+
+        // Run after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAuthorInfo);
+        } else {
+            initAuthorInfo();
+        }
+    </script>
+</body>
+</html>
